@@ -8,10 +8,180 @@
   assign image_maps = section.blocks | where: 'type', 'base_image_map'
   assign stickers = section.blocks | where: 'sticker'
 -%}
+{%- liquid
+  assign tr_title = 'case_customizer.title' | t
+  if tr_title contains 'Translation missing' 
+    assign tr_title = 'Please select the product to customize'
+  endif
+  assign tr_help = 'case_customizer.editor.help_select_product' | t
+  if tr_help contains 'Translation missing'
+    assign tr_help = 'Open the theme editor and set the product handle in this section'
+  endif
+  assign tr_hint_preview = 'case_customizer.hint_preview' | t
+  if tr_hint_preview contains 'Translation missing'
+    assign tr_hint_preview = 'Image and text overlay in real time; base image switches by model and case type'
+  endif
+  assign tr_field_model = 'case_customizer.field_model' | t
+  if tr_field_model contains 'Translation missing'
+    assign tr_field_model = 'Phone model'
+  endif
+  assign tr_field_case_type = 'case_customizer.field_case_type' | t
+  if tr_field_case_type contains 'Translation missing'
+    assign tr_field_case_type = 'Case type'
+  endif
+  assign tr_field_upload_image = 'case_customizer.field_upload_image' | t
+  if tr_field_upload_image contains 'Translation missing'
+    assign tr_field_upload_image = 'Upload image'
+  endif
+  assign tr_field_image_x = 'case_customizer.field_image_x' | t
+  if tr_field_image_x contains 'Translation missing'
+    assign tr_field_image_x = 'Image X (%)'
+  endif
+  assign tr_field_image_y = 'case_customizer.field_image_y' | t
+  if tr_field_image_y contains 'Translation missing'
+    assign tr_field_image_y = 'Image Y (%)'
+  endif
+  assign tr_field_image_scale = 'case_customizer.field_image_scale' | t
+  if tr_field_image_scale contains 'Translation missing'
+    assign tr_field_image_scale = 'Image scale (%)'
+  endif
+  assign tr_fit_mode_label = 'case_customizer.fit_mode_label' | t
+  if tr_fit_mode_label contains 'Translation missing'
+    assign tr_fit_mode_label = 'Fit mode'
+  endif
+  assign tr_fit_mode_cover = 'case_customizer.fit_mode_cover' | t
+  if tr_fit_mode_cover contains 'Translation missing'
+    assign tr_fit_mode_cover = 'Cover'
+  endif
+  assign tr_fit_mode_contain = 'case_customizer.fit_mode_contain' | t
+  if tr_fit_mode_contain contains 'Translation missing'
+    assign tr_fit_mode_contain = 'Contain'
+  endif
+  assign tr_fit_mode_stretch = 'case_customizer.fit_mode_stretch' | t
+  if tr_fit_mode_stretch contains 'Translation missing'
+    assign tr_fit_mode_stretch = 'Stretch'
+  endif
+  assign tr_auto_fit = 'case_customizer.auto_fit' | t
+  if tr_auto_fit contains 'Translation missing'
+    assign tr_auto_fit = 'Auto fit after upload'
+  endif
+  assign tr_clip_to_area = 'case_customizer.clip_to_area' | t
+  if tr_clip_to_area contains 'Translation missing'
+    assign tr_clip_to_area = 'Clip to printable area'
+  endif
+  assign tr_image_rotation = 'case_customizer.image_rotation' | t
+  if tr_image_rotation contains 'Translation missing'
+    assign tr_image_rotation = 'Rotation (°)'
+  endif
+  assign tr_field_text = 'case_customizer.field_text' | t
+  if tr_field_text contains 'Translation missing'
+    assign tr_field_text = 'Custom text'
+  endif
+  assign tr_field_text_placeholder = 'case_customizer.field_text_placeholder' | t
+  if tr_field_text_placeholder contains 'Translation missing'
+    assign tr_field_text_placeholder = 'Type your text'
+  endif
+  assign tr_field_text_x = 'case_customizer.field_text_x' | t
+  if tr_field_text_x contains 'Translation missing'
+    assign tr_field_text_x = 'Text X (%)'
+  endif
+  assign tr_field_text_y = 'case_customizer.field_text_y' | t
+  if tr_field_text_y contains 'Translation missing'
+    assign tr_field_text_y = 'Text Y (%)'
+  endif
+  assign tr_field_text_size = 'case_customizer.field_text_size' | t
+  if tr_field_text_size contains 'Translation missing'
+    assign tr_field_text_size = 'Text size'
+  endif
+  assign tr_field_text_color = 'case_customizer.field_text_color' | t
+  if tr_field_text_color contains 'Translation missing'
+    assign tr_field_text_color = 'Text color'
+  endif
+  assign tr_sticker_controls = 'case_customizer.sticker_controls' | t
+  if tr_sticker_controls contains 'Translation missing'
+    assign tr_sticker_controls = 'Sticker position and scale'
+  endif
+  assign tr_sticker_x = 'case_customizer.sticker_x' | t
+  if tr_sticker_x contains 'Translation missing'
+    assign tr_sticker_x = 'Sticker X (%)'
+  endif
+  assign tr_sticker_y = 'case_customizer.sticker_y' | t
+  if tr_sticker_y contains 'Translation missing'
+    assign tr_sticker_y = 'Sticker Y (%)'
+  endif
+  assign tr_sticker_scale = 'case_customizer.sticker_scale' | t
+  if tr_sticker_scale contains 'Translation missing'
+    assign tr_sticker_scale = 'Sticker scale (%)'
+  endif
+  assign tr_submit = 'case_customizer.submit_add_to_cart' | t
+  if tr_submit contains 'Translation missing'
+    assign tr_submit = 'Add to cart'
+  endif
+  assign tr_prop_image = 'case_customizer.property.image' | t
+  if tr_prop_image contains 'Translation missing'
+    assign tr_prop_image = 'Custom Image'
+  endif
+  assign tr_prop_image_x = 'case_customizer.property.image_x' | t
+  if tr_prop_image_x contains 'Translation missing'
+    assign tr_prop_image_x = 'Image X (%)'
+  endif
+  assign tr_prop_image_y = 'case_customizer.property.image_y' | t
+  if tr_prop_image_y contains 'Translation missing'
+    assign tr_prop_image_y = 'Image Y (%)'
+  endif
+  assign tr_prop_image_scale = 'case_customizer.property.image_scale' | t
+  if tr_prop_image_scale contains 'Translation missing'
+    assign tr_prop_image_scale = 'Image Scale (%)'
+  endif
+  assign tr_prop_text = 'case_customizer.property.text' | t
+  if tr_prop_text contains 'Translation missing'
+    assign tr_prop_text = 'Custom Text'
+  endif
+  assign tr_prop_text_x = 'case_customizer.property.text_x' | t
+  if tr_prop_text_x contains 'Translation missing'
+    assign tr_prop_text_x = 'Text X (%)'
+  endif
+  assign tr_prop_text_y = 'case_customizer.property.text_y' | t
+  if tr_prop_text_y contains 'Translation missing'
+    assign tr_prop_text_y = 'Text Y (%)'
+  endif
+  assign tr_prop_text_size = 'case_customizer.property.text_size' | t
+  if tr_prop_text_size contains 'Translation missing'
+    assign tr_prop_text_size = 'Text Size'
+  endif
+  assign tr_prop_text_color = 'case_customizer.property.text_color' | t
+  if tr_prop_text_color contains 'Translation missing'
+    assign tr_prop_text_color = 'Text Color'
+  endif
+  assign tr_prop_sticker_name = 'case_customizer.property.sticker_name' | t
+  if tr_prop_sticker_name contains 'Translation missing'
+    assign tr_prop_sticker_name = 'Sticker Name'
+  endif
+  assign tr_prop_sticker_x = 'case_customizer.property.sticker_x' | t
+  if tr_prop_sticker_x contains 'Translation missing'
+    assign tr_prop_sticker_x = 'Sticker X (%)'
+  endif
+  assign tr_prop_sticker_y = 'case_customizer.property.sticker_y' | t
+  if tr_prop_sticker_y contains 'Translation missing'
+    assign tr_prop_sticker_y = 'Sticker Y (%)'
+  endif
+  assign tr_prop_sticker_scale = 'case_customizer.property.sticker_scale' | t
+  if tr_prop_sticker_scale contains 'Translation missing'
+    assign tr_prop_sticker_scale = 'Sticker Scale (%)'
+  endif
+  assign tr_prop_fit_mode = 'case_customizer.property.fit_mode' | t
+  if tr_prop_fit_mode contains 'Translation missing'
+    assign tr_prop_fit_mode = 'Fit Mode'
+  endif
+  assign tr_prop_rotation = 'case_customizer.property.rotation' | t
+  if tr_prop_rotation contains 'Translation missing'
+    assign tr_prop_rotation = 'Rotation (deg)'
+  endif
+-%}
 {%- if custom_product == blank -%}
   <div class="container" style="max-width:1100px;margin:0 auto;padding:20px;">
-    <h2 style="margin:0 0 10px;">{{ 'case_customizer.title' | t | default: 'Please select the product to customize' }}</h2>
-    <p>{{ 'case_customizer.editor.help_select_product' | t | default: 'Open the theme editor and set the product handle in this section' }}</p>
+    <h2 style="margin:0 0 10px;">{{ tr_title }}</h2>
+    <p>{{ tr_help }}</p>
   </div>
 {%- else -%}
   <div class="container" style="max-width:1100px;margin:0 auto;padding:20px;">
@@ -20,7 +190,7 @@
         <div id="preview-wrap" style="position:relative;border:1px solid #eee;border-radius:8px;overflow:hidden;background:#fff;">
           <canvas id="customizer-canvas" width="{{ canvas_w }}" height="{{ canvas_w }}"></canvas>
         </div>
-        <div style="margin-top:10px;font-size:12px;color:#666;">{{ 'case_customizer.hint_preview' | t | default: 'Image and text overlay in real time; base image switches by model and case type' }}</div>
+        <div style="margin-top:10px;font-size:12px;color:#666;">{{ tr_hint_preview }}</div>
         <div id="sticker-list" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;">
           {%- for b in stickers -%}
             {%- if b.settings.image != blank -%}
@@ -34,79 +204,79 @@
         {%- form 'product', custom_product, id: form_id, class: 'form', novalidate: 'novalidate' -%}
           <div style="display:flex;flex-direction:column;gap:14px;">
             <div>
-              <label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_model' | t | default: 'Phone model' }}</label>
+              <label style="display:block;margin-bottom:6px;">{{ tr_field_model }}</label>
               <select id="select-model" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"></select>
             </div>
             <div>
-              <label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_case_type' | t | default: 'Case type' }}</label>
+              <label style="display:block;margin-bottom:6px;">{{ tr_field_case_type }}</label>
               <select id="select-type" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"></select>
             </div>
             <input type="hidden" name="id" id="variant-id">
             <div>
-              <label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_upload_image' | t | default: 'Upload image' }}</label>
-              <input id="input-image" type="file" accept="image/*" name="properties[{{ 'case_customizer.property.image' | t | default: 'Custom Image' }}]" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.image_x' | t | default: 'Image X (%)' }}]" id="prop-image-x">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.image_y' | t | default: 'Image Y (%)' }}]" id="prop-image-y">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.image_scale' | t | default: 'Image Scale (%)' }}]" id="prop-image-scale">
+              <label style="display:block;margin-bottom:6px;">{{ tr_field_upload_image }}</label>
+              <input id="input-image" type="file" accept="image/*" name="properties[{{ tr_prop_image }}]" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+              <input type="hidden" name="properties[{{ tr_prop_image_x }}]" id="prop-image-x">
+              <input type="hidden" name="properties[{{ tr_prop_image_y }}]" id="prop-image-y">
+              <input type="hidden" name="properties[{{ tr_prop_image_scale }}]" id="prop-image-scale">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_image_x' | t | default: 'Image X (%)' }}</label><input id="image-x" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_image_y' | t | default: 'Image Y (%)' }}</label><input id="image-y" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_image_scale' | t | default: 'Image scale (%)' }}</label><input id="image-scale" type="range" min="10" max="200" value="100" style="width:100%;"></div>
+              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_image_x }}</label><input id="image-x" type="range" min="0" max="100" value="50" style="width:100%;"></div>
+              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_image_y }}</label><input id="image-y" type="range" min="0" max="100" value="50" style="width:100%;"></div>
+              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_image_scale }}</label><input id="image-scale" type="range" min="10" max="200" value="100" style="width:100%;"></div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
               <div>
-                <label style="display:block;margin-bottom:6px;">{{ 'case_customizer.fit_mode_label' | t | default: 'Fit mode' }}</label>
+                <label style="display:block;margin-bottom:6px;">{{ tr_fit_mode_label }}</label>
                 <select id="fit-mode" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
-                  <option value="cover">{{ 'case_customizer.fit_mode_cover' | t | default: 'Cover' }}</option>
-                  <option value="contain">{{ 'case_customizer.fit_mode_contain' | t | default: 'Contain' }}</option>
-                  <option value="stretch">{{ 'case_customizer.fit_mode_stretch' | t | default: 'Stretch' }}</option>
+                  <option value="cover">{{ tr_fit_mode_cover }}</option>
+                  <option value="contain">{{ tr_fit_mode_contain }}</option>
+                  <option value="stretch">{{ tr_fit_mode_stretch }}</option>
                 </select>
                 <div style="margin-top:8px;display:flex;gap:12px;align-items:center;">
                   <label style="display:flex;gap:6px;align-items:center;">
                     <input id="auto-fit" type="checkbox" checked>
-                    <span>{{ 'case_customizer.auto_fit' | t | default: 'Auto fit after upload' }}</span>
+                    <span>{{ tr_auto_fit }}</span>
                   </label>
                   <label style="display:flex;gap:6px;align-items:center;">
                     <input id="clip-area" type="checkbox" checked>
-                    <span>{{ 'case_customizer.clip_to_area' | t | default: 'Clip to printable area' }}</span>
+                    <span>{{ tr_clip_to_area }}</span>
                   </label>
                 </div>
               </div>
               <div>
-                <label style="display:block;margin-bottom:6px;">{{ 'case_customizer.image_rotation' | t | default: 'Rotation (°)' }}</label>
+                <label style="display:block;margin-bottom:6px;">{{ tr_image_rotation }}</label>
                 <input id="image-rotation" type="range" min="-180" max="180" value="0" style="width:100%;">
               </div>
             </div>
-            <input type="hidden" name="properties[{{ 'case_customizer.property.fit_mode' | t | default: 'Fit Mode' }}]" id="prop-fit-mode">
-            <input type="hidden" name="properties[{{ 'case_customizer.property.rotation' | t | default: 'Rotation (deg)' }}]" id="prop-image-rotation">
+            <input type="hidden" name="properties[{{ tr_prop_fit_mode }}]" id="prop-fit-mode">
+            <input type="hidden" name="properties[{{ tr_prop_rotation }}]" id="prop-image-rotation">
             <div>
-              <label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_text' | t | default: 'Custom text' }}</label>
-              <input id="input-text" type="text" name="properties[{{ 'case_customizer.property.text' | t | default: 'Custom Text' }}]" placeholder="{{ 'case_customizer.field_text_placeholder' | t | default: 'Type your text' }}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.text_x' | t | default: 'Text X (%)' }}]" id="prop-text-x">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.text_y' | t | default: 'Text Y (%)' }}]" id="prop-text-y">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.text_size' | t | default: 'Text Size' }}]" id="prop-text-size">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.text_color' | t | default: 'Text Color' }}]" id="prop-text-color">
+              <label style="display:block;margin-bottom:6px;">{{ tr_field_text }}</label>
+              <input id="input-text" type="text" name="properties[{{ tr_prop_text }}]" placeholder="{{ tr_field_text_placeholder }}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+              <input type="hidden" name="properties[{{ tr_prop_text_x }}]" id="prop-text-x">
+              <input type="hidden" name="properties[{{ tr_prop_text_y }}]" id="prop-text-y">
+              <input type="hidden" name="properties[{{ tr_prop_text_size }}]" id="prop-text-size">
+              <input type="hidden" name="properties[{{ tr_prop_text_color }}]" id="prop-text-color">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_text_x' | t | default: 'Text X (%)' }}</label><input id="text-x" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_text_y' | t | default: 'Text Y (%)' }}</label><input id="text-y" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_text_size' | t | default: 'Text size' }}</label><input id="text-size" type="range" min="12" max="64" value="26" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.field_text_color' | t | default: 'Text color' }}</label><input id="text-color" type="color" value="#111111" style="width:100%;height:38px;border:1px solid #ddd;border-radius:6px;"></div>
+              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_text_x }}</label><input id="text-x" type="range" min="0" max="100" value="50" style="width:100%;"></div>
+              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_text_y }}</label><input id="text-y" type="range" min="0" max="100" value="50" style="width:100%;"></div>
+              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_text_size }}</label><input id="text-size" type="range" min="12" max="64" value="26" style="width:100%;"></div>
+              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_text_color }}</label><input id="text-color" type="color" value="#111111" style="width:100%;height:38px;border:1px solid #ddd;border-radius:6px;"></div>
             </div>
             <div>
-              <label style="display:block;margin-bottom:6px;">{{ 'case_customizer.sticker_controls' | t | default: 'Sticker position and scale' }}</label>
+              <label style="display:block;margin-bottom:6px;">{{ tr_sticker_controls }}</label>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.sticker_x' | t | default: 'Sticker X (%)' }}</label><input id="sticker-x" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-                <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.sticker_y' | t | default: 'Sticker Y (%)' }}</label><input id="sticker-y" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-                <div><label style="display:block;margin-bottom:6px;">{{ 'case_customizer.sticker_scale' | t | default: 'Sticker scale (%)' }}</label><input id="sticker-scale" type="range" min="10" max="200" value="100" style="width:100%;"></div>
+                <div><label style="display:block;margin-bottom:6px;">{{ tr_sticker_x }}</label><input id="sticker-x" type="range" min="0" max="100" value="50" style="width:100%;"></div>
+                <div><label style="display:block;margin-bottom:6px;">{{ tr_sticker_y }}</label><input id="sticker-y" type="range" min="0" max="100" value="50" style="width:100%;"></div>
+                <div><label style="display:block;margin-bottom:6px;">{{ tr_sticker_scale }}</label><input id="sticker-scale" type="range" min="10" max="200" value="100" style="width:100%;"></div>
               </div>
-              <input type="hidden" name="properties[{{ 'case_customizer.property.sticker_name' | t | default: 'Sticker Name' }}]" id="prop-sticker-name">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.sticker_x' | t | default: 'Sticker X (%)' }}]" id="prop-sticker-x">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.sticker_y' | t | default: 'Sticker Y (%)' }}]" id="prop-sticker-y">
-              <input type="hidden" name="properties[{{ 'case_customizer.property.sticker_scale' | t | default: 'Sticker Scale (%)' }}]" id="prop-sticker-scale">
+              <input type="hidden" name="properties[{{ tr_prop_sticker_name }}]" id="prop-sticker-name">
+              <input type="hidden" name="properties[{{ tr_prop_sticker_x }}]" id="prop-sticker-x">
+              <input type="hidden" name="properties[{{ tr_prop_sticker_y }}]" id="prop-sticker-y">
+              <input type="hidden" name="properties[{{ tr_prop_sticker_scale }}]" id="prop-sticker-scale">
             </div>
-            <div><button type="submit" class="btn-primary" style="width:100%;padding:12px;border:0;border-radius:8px;background:#111;color:#fff;">{{ 'case_customizer.submit_add_to_cart' | t | default: 'Add to cart' }}</button></div>
+            <div><button type="submit" class="btn-primary" style="width:100%;padding:12px;border:0;border-radius:8px;background:#111;color:#fff;">{{ tr_submit }}</button></div>
           </div>
           <input type="hidden" id="data-area-left" value="{{ st.area_left }}">
           <input type="hidden" id="data-area-top" value="{{ st.area_top }}">
