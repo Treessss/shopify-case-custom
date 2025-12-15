@@ -1,9 +1,45 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "case-customizer",
-      "settings": {}
+      "blocks": {
+        "base_image_map_AMyntm": {
+          "type": "base_image_map",
+          "settings": {
+            "model_value": "15",
+            "case_type_value": "matte",
+            "area_left": 10,
+            "area_top": 10,
+            "area_width": 80,
+            "area_height": 80
+          }
+        }
+      },
+      "block_order": [
+        "base_image_map_AMyntm"
+      ],
+      "settings": {
+        "product_handle": "the-collection-snowboard-liquid",
+        "model_option_name": "Model",
+        "case_type_option_name": "Case Type",
+        "canvas_width": 700,
+        "area_left": 10,
+        "area_top": 10,
+        "area_width": 80,
+        "area_height": 80
+      }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }
