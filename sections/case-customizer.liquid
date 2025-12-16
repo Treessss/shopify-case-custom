@@ -180,10 +180,25 @@
   endif
 -%}
 <style>
-  .container { max-width: 1180px; margin: 0 auto; padding: 24px; }
-  .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; }
-  @media (max-width: 992px) { .grid { grid-template-columns: 1fr; gap: 16px; } }
+  .container { max-width: min(1280px, 94vw); margin: 0 auto; padding: 24px; }
+  .grid { display: grid; grid-template-columns: clamp(280px, 42vw, 520px) 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; gap: 18px; } }
+  @media (max-width: 640px) { .container { padding: 16px; } }
   #preview-wrap { position: relative; border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+  #preview-wrap canvas { width: 100%; height: auto; display: block; }
+  .panel-card { border: 1px solid #e5e5e5; border-radius: 12px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); padding: 20px; }
+  .panel-title { font-size: 26px; font-weight: 700; margin: 0 0 12px; }
+  .tabs { display: flex; gap: 12px; margin-bottom: 14px; }
+  .tab-btn { padding: 10px 14px; border: 1px solid #111; border-radius: 10px; background: #fff; font-weight: 600; }
+  .tab-btn.active { color: #fff; background: #111; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .palette { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .swatch { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #ddd; cursor: pointer; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.6); }
+  .hex-row { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+  .hex-input { flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; }
+  .panel-note { font-size: 12px; color: #666; margin-top: 8px; }
+  .sticky { position: sticky; top: 24px; }
   .form { display: flex; flex-direction: column; gap: 14px; }
   .form label { font-size: 14px; color: #111; }
   .form select, .form input[type="text"], .form input[type="file"] { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; background: #fff; transition: border-color .2s ease, box-shadow .2s ease; }
@@ -196,6 +211,14 @@
   #sticker-list img { width: 64px; height: 64px; object-fit: contain; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease; background: #fff; }
   #sticker-list img:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,0.08); border-color: #bbb; }
   #sticker-list img.active { border-color: #111; box-shadow: 0 0 0 3px rgba(17,17,17,0.12); }
+  .pattern-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .pattern-swatch { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; }
+  .pattern-swatch.active { border-color: #111; box-shadow: 0 0 0 3px rgba(17,17,17,0.12); }
+  .progress { height: 8px; border-radius: 999px; background: #f0f0f0; overflow: hidden; margin: 10px 0 14px; }
+  .progress-bar { height: 100%; background: #111; width: 33%; transition: width .25s ease; }
+  .step-nav { display:flex; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .btn-outline { width:auto; padding: 10px 14px; border: 1px solid #111; border-radius: 10px; background: #fff; color:#111; font-weight:600; }
+  .btn-outline[disabled] { opacity: 0.5; cursor: not-allowed; }
 </style>
 {%- if custom_product == blank -%}
   <div class="container">
@@ -222,6 +245,77 @@
         </div>
       </div>
       <div>
+        <div class="panel-card sticky">
+          <div class="panel-title">Create a Phone Case</div>
+          <div class="tabs">
+            <button type="button" class="tab-btn active" data-tab="color">COLOUR</button>
+            <button type="button" class="tab-btn" data-tab="pattern">PATTERN</button>
+            <button type="button" class="tab-btn" data-tab="image">IMAGE</button>
+          </div>
+          <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
+          <div class="step-nav">
+            <button id="btn-back" type="button" class="btn-outline">BACK</button>
+            <button id="btn-next" type="button" class="btn-primary" style="width:auto;">NEXT</button>
+          </div>
+          <div id="tab-color" class="tab-content active">
+            <div class="palette" id="palette">
+              <div class="swatch" data-color="#ffffff" style="background:#ffffff"></div>
+              <div class="swatch" data-color="#f4f4f4" style="background:#f4f4f4"></div>
+              <div class="swatch" data-color="#c9d66d" style="background:#c9d66d"></div>
+              <div class="swatch" data-color="#2c3428" style="background:#2c3428"></div>
+              <div class="swatch" data-color="#f6ead7" style="background:#f6ead7"></div>
+              <div class="swatch" data-color="#ffd6df" style="background:#ffd6df"></div>
+              <div class="swatch" data-color="#7c3f2c" style="background:#7c3f2c"></div>
+              <div class="swatch" data-color="#f587c1" style="background:#f587c1"></div>
+              <div class="swatch" data-color="#e7332b" style="background:#e7332b"></div>
+              <div class="swatch" data-color="#6c1a1a" style="background:#6c1a1a"></div>
+              <div class="swatch" data-color="#f2e6cf" style="background:#f2e6cf"></div>
+              <div class="swatch" data-color="#ffef85" style="background:#ffef85"></div>
+              <div class="swatch" data-color="#f7a01e" style="background:#f7a01e"></div>
+              <div class="swatch" data-color="#9cc7ff" style="background:#9cc7ff"></div>
+              <div class="swatch" data-color="#3045c7" style="background:#3045c7"></div>
+              <div class="swatch" data-color="#7645ff" style="background:#7645ff"></div>
+              <div class="swatch" data-color="#f2f2f2" style="background:#f2f2f2"></div>
+              <div class="swatch" data-color="#cad5e5" style="background:#cad5e5"></div>
+              <div class="swatch" data-color="#8291a7" style="background:#8291a7"></div>
+              <div class="swatch" data-color="#101316" style="background:#101316"></div>
+              <div class="swatch" data-color="#4b4f27" style="background:#4b4f27"></div>
+              <div class="swatch" data-color="#472a25" style="background:#472a25"></div>
+              <div class="swatch" data-color="#ffffff" style="background:#ffffff"></div>
+              <div class="swatch" data-color="#000000" style="background:#000000"></div>
+            </div>
+            <div class="hex-row">
+              <input id="color-hex" class="hex-input" value="#2C3428" />
+            </div>
+            <div class="panel-note">PLEASE NOTE THAT COLOURS MAY PRINT SLIGHTLY DARKER THAN THEY APPEAR ON SCREEN</div>
+          </div>
+          <div id="tab-pattern" class="tab-content">
+            <div id="pattern-grid" class="pattern-grid">
+              <div class="pattern-swatch" data-pattern="none" style="background:#f2f2f2"></div>
+              <div class="pattern-swatch" data-pattern="stripes" style="background: repeating-linear-gradient(45deg, #111 0 10px, #fff 10px 20px);"></div>
+              <div class="pattern-swatch" data-pattern="dots" style="background: radial-gradient(#111 18%, transparent 19%); background-size: 14px 14px; background-color:#fff;"></div>
+              <div class="pattern-swatch" data-pattern="grid" style="background: repeating-linear-gradient(0deg, #111 0 1px, transparent 1px 20px), repeating-linear-gradient(90deg, #111 0 1px, transparent 1px 20px); background-color:#fff;"></div>
+              <div class="pattern-swatch" data-pattern="crosshatch" style="background: repeating-linear-gradient(45deg, #111 0 1px, transparent 1px 12px), repeating-linear-gradient(-45deg, #111 0 1px, transparent 1px 12px); background-color:#fff;"></div>
+              <div class="pattern-swatch" data-pattern="diagonal" style="background: repeating-linear-gradient(135deg, #111 0 6px, #fff 6px 12px);"></div>
+              <div class="pattern-swatch" data-pattern="waves" style="background: radial-gradient(circle at 10px 10px, #fff 8px, transparent 9px), radial-gradient(circle at 40px 10px, #fff 8px, transparent 9px); background-size: 50px 20px; background-color:#111;"></div>
+              <div class="pattern-swatch" data-pattern="honeycomb" style="background:#fff; border-style:dashed"></div>
+              <div class="pattern-swatch" data-pattern="checker" style="background: conic-gradient(#111 0 25%, #fff 0 50%, #111 0 75%, #fff 0); background-size: 20px 20px;"></div>
+              <div class="pattern-swatch" data-pattern="chevron" style="background:#fff; border-style:dashed"></div>
+              <div class="pattern-swatch" data-pattern="herringbone" style="background:#fff; border-style:dashed"></div>
+              <div class="pattern-swatch" data-pattern="terrazzo" style="background:#fff; border-style:dashed"></div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
+              <div><label style="display:block;margin-bottom:6px;">PATTERN SCALE</label><input id="pattern-scale" type="range" min="50" max="200" value="100" style="width:100%;"></div>
+              <div><label style="display:block;margin-bottom:6px;">PATTERN OPACITY</label><input id="pattern-opacity" type="range" min="0" max="100" value="30" style="width:100%;"></div>
+            </div>
+          </div>
+          <div id="tab-image" class="tab-content">
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button id="trigger-upload" type="button" class="btn-primary" style="width:auto; padding:10px 14px;">上传图片</button>
+              <div id="image-state" style="font-size:12px; color:#666;">未选择图片</div>
+            </div>
+          </div>
+        </div>
         {%- assign form_id = 'case-customizer-form-' | append: section.id -%}
         {%- form 'product', custom_product, id: form_id, class: 'form', novalidate: 'novalidate' -%}
           <div style="display:flex;flex-direction:column;gap:14px;">
@@ -300,10 +394,14 @@
             </div>
             <div><button type="submit" class="btn-primary">{{ tr_submit }}</button></div>
           </div>
-          <input type="hidden" id="data-area-left" value="{{ st.area_left }}">
-          <input type="hidden" id="data-area-top" value="{{ st.area_top }}">
-          <input type="hidden" id="data-area-width" value="{{ st.area_width }}">
+            <input type="hidden" id="data-area-left" value="{{ st.area_left }}">
+            <input type="hidden" id="data-area-top" value="{{ st.area_top }}">
+            <input type="hidden" id="data-area-width" value="{{ st.area_width }}">
           <input type="hidden" id="data-area-height" value="{{ st.area_height }}">
+          <input type="hidden" name="properties[Case Color HEX]" id="prop-case-color">
+          <input type="hidden" name="properties[Case Pattern Type]" id="prop-pattern-type">
+          <input type="hidden" name="properties[Case Pattern Scale]" id="prop-pattern-scale">
+          <input type="hidden" name="properties[Case Pattern Opacity]" id="prop-pattern-opacity">
         {%- endform -%}
       </div>
     </div>
@@ -369,6 +467,17 @@
       var rotationEl = document.getElementById('image-rotation');
       var propFitMode = document.getElementById('prop-fit-mode');
       var propImageRotation = document.getElementById('prop-image-rotation');
+      var palette = document.getElementById('palette');
+      var colorHexInput = document.getElementById('color-hex');
+      var propCaseColor = document.getElementById('prop-case-color');
+      var patternGrid = document.getElementById('pattern-grid');
+      var patternType = 'none';
+      var progressBar = document.getElementById('progress-bar');
+      var patternScaleInput = document.getElementById('pattern-scale');
+      var patternOpacityInput = document.getElementById('pattern-opacity');
+      var propPatternType = document.getElementById('prop-pattern-type');
+      var propPatternScale = document.getElementById('prop-pattern-scale');
+      var propPatternOpacity = document.getElementById('prop-pattern-opacity');
       var propTextX = document.getElementById('prop-text-x');
       var propTextY = document.getElementById('prop-text-y');
       var propTextSize = document.getElementById('prop-text-size');
@@ -422,6 +531,117 @@
 
       var rafPending = false;
       function requestDraw(){ if (!rafPending) { rafPending = true; requestAnimationFrame(function(){ rafPending = false; draw(); }); } }
+      var caseColor = '#2C3428';
+      function hexToRgb(h){
+        var s = h.replace('#','');
+        var r = parseInt(s.substring(0,2),16);
+        var g = parseInt(s.substring(2,4),16);
+        var b = parseInt(s.substring(4,6),16);
+        return { r:r, g:g, b:b };
+      }
+      function generatePatternCanvas(type, baseColor, scalePct){
+        var pc = document.createElement('canvas');
+        var base = 80;
+        var s = Math.max(20, Math.round(base * (scalePct/100)));
+        pc.width = s; pc.height = s;
+        var pctx = pc.getContext('2d');
+        pctx.clearRect(0,0,pc.width, pc.height);
+        var rgb = hexToRgb(baseColor);
+        var stroke = 'rgba('+rgb.r+','+rgb.g+','+rgb.b+',0.25)';
+        var fill = 'rgba('+rgb.r+','+rgb.g+','+rgb.b+',0.15)';
+        if (type === 'stripes') {
+          pctx.fillStyle = fill;
+          for (var i=0;i<pc.width;i+=Math.round(s/8)){ pctx.fillRect(i,0,Math.round(s/12),pc.height); }
+        } else if (type === 'dots') {
+          pctx.fillStyle = fill;
+          for (var y=Math.round(s/10);y<pc.height;y+=Math.round(s/5)){
+            for (var x=Math.round(s/10);x<pc.width;x+=Math.round(s/5)){ pctx.beginPath(); pctx.arc(x,y,Math.round(s/20),0,Math.PI*2); pctx.fill(); }
+          }
+        } else if (type === 'grid') {
+          pctx.strokeStyle = stroke; pctx.lineWidth = 1;
+          var step = Math.round(s/8);
+          for (var gx=step; gx<pc.width; gx+=step){ pctx.beginPath(); pctx.moveTo(gx,0); pctx.lineTo(gx,pc.height); pctx.stroke(); }
+          for (var gy=step; gy<pc.height; gy+=step){ pctx.beginPath(); pctx.moveTo(0,gy); pctx.lineTo(pc.width,gy); pctx.stroke(); }
+        } else if (type === 'crosshatch') {
+          pctx.strokeStyle = stroke; pctx.lineWidth = 1;
+          var step2 = Math.round(s/10);
+          for (var d=-pc.height; d<pc.width; d+=step2){ pctx.beginPath(); pctx.moveTo(d,0); pctx.lineTo(d+pc.height,pc.height); pctx.stroke(); }
+          for (var d2=-pc.height; d2<pc.width; d2+=step2){ pctx.beginPath(); pctx.moveTo(d2,pc.height); pctx.lineTo(d2+pc.height,0); pctx.stroke(); }
+        } else if (type === 'diagonal') {
+          pctx.fillStyle = fill;
+          var w = Math.round(s/10);
+          for (var k=-pc.height; k<pc.width; k+=Math.round(s/6)){ pctx.save(); pctx.translate(k,0); pctx.rotate(45*Math.PI/180); pctx.fillRect(0,0,w,pc.height*1.5); pctx.restore(); }
+        } else if (type === 'waves') {
+          pctx.fillStyle = fill;
+          var ry = Math.round(s/5), rx = Math.round(s/2.5), rad = Math.round(s/10);
+          for (var wy=0; wy<pc.height; wy+=ry){
+            for (var wx=0; wx<pc.width; wx+=rx){ pctx.beginPath(); pctx.arc(wx+Math.round(rad), wy+Math.round(rad), rad, Math.PI*0.5, Math.PI*1.5); pctx.arc(wx+Math.round(rad*3), wy+Math.round(rad), rad, Math.PI*1.5, Math.PI*0.5); pctx.closePath(); pctx.fill(); }
+          }
+        } else if (type === 'honeycomb') {
+          pctx.strokeStyle = stroke; pctx.lineWidth = 1;
+          var a = Math.round(s/6);
+          var h = Math.round(Math.sin(Math.PI/3) * a);
+          for (var y=0; y<pc.height + h; y+=h) {
+            for (var x=0; x<pc.width + a; x+=a) {
+              var ox = (Math.round(y/h)%2) ? Math.round(a/2) : 0;
+              pctx.beginPath();
+              pctx.moveTo(x+ox + a/2, y);
+              pctx.lineTo(x+ox + a, y+h);
+              pctx.lineTo(x+ox + a/2, y+2*h);
+              pctx.lineTo(x+ox, y+h);
+              pctx.closePath();
+              pctx.stroke();
+            }
+          }
+        } else if (type === 'checker') {
+          var step = Math.round(s/4);
+          for (var y=0; y<pc.height; y+=step){
+            for (var x=0; x<pc.width; x+=step){
+              var on = (((x/step) + (y/step)) % 2) === 0;
+              pctx.fillStyle = on ? fill : 'transparent';
+              pctx.fillRect(x,y,step,step);
+            }
+          }
+        } else if (type === 'chevron') {
+          pctx.strokeStyle = stroke; pctx.lineWidth = 2;
+          var step = Math.round(s/5);
+          for (var y=step; y<pc.height; y+=step){
+            pctx.beginPath();
+            pctx.moveTo(0,y);
+            pctx.lineTo(s/2,y-step);
+            pctx.lineTo(s,y);
+            pctx.stroke();
+          }
+        } else if (type === 'herringbone') {
+          pctx.fillStyle = fill;
+          var step = Math.round(s/5);
+          for (var y=0; y<pc.height; y+=step){
+            for (var x=0; x<pc.width; x+=step){
+              pctx.save();
+              pctx.translate(x,y);
+              pctx.rotate(((x/step)%2===0)? 45*Math.PI/180 : -45*Math.PI/180);
+              pctx.fillRect(0,0,Math.round(step/2), step);
+              pctx.restore();
+            }
+          }
+        } else if (type === 'terrazzo') {
+          var pieces = 12;
+          for (var i=0;i<pieces;i++){
+            var px = Math.random()*s, py = Math.random()*s;
+            var pw = Math.random()*Math.round(s/4);
+            var ph = Math.random()*Math.round(s/4);
+            pctx.fillStyle = 'rgba('+rgb.r+','+rgb.g+','+rgb.b+','+(0.1 + Math.random()*0.2)+')';
+            pctx.beginPath();
+            pctx.moveTo(px,py);
+            pctx.lineTo(px+pw,py);
+            pctx.lineTo(px+pw,py+ph);
+            pctx.lineTo(px,py+ph);
+            pctx.closePath();
+            pctx.fill();
+          }
+        }
+        return pc;
+      }
       function draw() {
         var ratio = baseImg.width / baseImg.height || 1;
         var wrap = document.getElementById('preview-wrap');
@@ -440,6 +660,34 @@
         ctx.lineWidth = 2;
         ctx.strokeRect(areaLeft, areaTop, areaW, areaH);
         ctx.restore();
+        if (patternType && patternType !== 'none') {
+          var scalePct = patternScaleInput ? parseFloat(patternScaleInput.value || '100') : 100;
+          var tile = generatePatternCanvas(patternType, caseColor, scalePct);
+          var pat = ctx.createPattern(tile, 'repeat');
+          var pcomp = document.createElement('canvas');
+          pcomp.width = Math.max(1, Math.round(areaW));
+          pcomp.height = Math.max(1, Math.round(areaH));
+          var pctx = pcomp.getContext('2d');
+          pctx.fillStyle = pat;
+          pctx.fillRect(0,0,pcomp.width,pcomp.height);
+          if (hasMask && maskImg.width) {
+            pctx.globalCompositeOperation = 'destination-in';
+            pctx.drawImage(maskImg, 0, 0, pcomp.width, pcomp.height);
+            pctx.globalCompositeOperation = 'source-over';
+          }
+          var pop = patternOpacityInput ? Math.max(0, Math.min(1, parseFloat(patternOpacityInput.value || '30')/100)) : 0.3;
+          ctx.save();
+          ctx.globalAlpha = pop;
+          ctx.drawImage(pcomp, areaLeft, areaTop);
+          ctx.restore();
+        }
+        if (caseColor && caseColor.length) {
+          ctx.save();
+          ctx.globalCompositeOperation = 'multiply';
+          ctx.fillStyle = caseColor;
+          ctx.fillRect(areaLeft, areaTop, areaW, areaH);
+          ctx.restore();
+        }
         if (hasUploaded && uploadedImg.width) {
           var imgPctX = parseFloat(imgXInput.value || '50');
           var imgPctY = parseFloat(imgYInput.value || '50');
@@ -646,6 +894,9 @@
         uploadedImg.onload = function() { hasUploaded = true; requestDraw(); };
         uploadedImg.src = url;
       });
+      if (uploadInput) {
+        uploadInput.addEventListener('change', function(){ if (imageState) { imageState.textContent = '已选择图片'; } });
+      }
 
       document.getElementById('sticker-list').addEventListener('click', function(e){
         var idx = e.target && e.target.dataset && e.target.dataset.sticker;
@@ -787,6 +1038,65 @@
 
       baseImg.src = {{ fallback_image | image_url: width: canvas_w | json }};
       initSelectors();
+      var tabBtns = document.querySelectorAll('.tab-btn');
+      var tabViews = { color: document.getElementById('tab-color'), pattern: document.getElementById('tab-pattern'), image: document.getElementById('tab-image') };
+      var tabOrder = ['color','pattern','image'];
+      var currentTab = 'color';
+      function setTab(t){
+        Array.prototype.forEach.call(tabBtns, function(b){ b.classList.toggle('active', b.dataset.tab === t); });
+        Object.keys(tabViews).forEach(function(k){ tabViews[k].classList.toggle('active', k === t); });
+        if (progressBar) {
+          var pct = t === 'color' ? 33 : (t === 'pattern' ? 66 : 100);
+          progressBar.style.width = pct + '%';
+        }
+        currentTab = t;
+        var backBtn = document.getElementById('btn-back');
+        var nextBtn = document.getElementById('btn-next');
+        var idx = tabOrder.indexOf(currentTab);
+        if (backBtn) backBtn.disabled = idx <= 0;
+        if (nextBtn) nextBtn.disabled = idx >= tabOrder.length - 1;
+      }
+      Array.prototype.forEach.call(tabBtns, function(b){ b.addEventListener('click', function(){ setTab(b.dataset.tab); }); });
+      setTab('color');
+      palette.addEventListener('click', function(e){
+        var c = e.target && e.target.dataset && e.target.dataset.color;
+        if (!c) return;
+        caseColor = c;
+        colorHexInput.value = c.toUpperCase();
+        propCaseColor.value = c.toUpperCase();
+        requestDraw();
+      });
+      colorHexInput.addEventListener('input', function(){
+        var v = colorHexInput.value.trim();
+        if (/^#?[0-9a-fA-F]{6}$/.test(v)) {
+          if (v[0] !== '#') v = '#' + v;
+          caseColor = v;
+          propCaseColor.value = v.toUpperCase();
+          requestDraw();
+        }
+      });
+      if (patternGrid) {
+        patternGrid.addEventListener('click', function(e){
+          var p = e.target && e.target.dataset && e.target.dataset.pattern;
+          if (!p) return;
+          patternType = p;
+          Array.prototype.forEach.call(document.querySelectorAll('#pattern-grid .pattern-swatch'), function(s){ s.classList.remove('active'); });
+          if (e.target && e.target.classList) { e.target.classList.add('active'); }
+          if (propPatternType) { propPatternType.value = p; }
+          requestDraw();
+        });
+      }
+      if (patternScaleInput) { patternScaleInput.addEventListener('input', function(){ if (propPatternScale) { propPatternScale.value = patternScaleInput.value; } requestDraw(); }); }
+      if (patternOpacityInput) { patternOpacityInput.addEventListener('input', function(){ if (propPatternOpacity) { propPatternOpacity.value = patternOpacityInput.value; } requestDraw(); }); }
+      var triggerUpload = document.getElementById('trigger-upload');
+      var imageState = document.getElementById('image-state');
+      if (triggerUpload) {
+        triggerUpload.addEventListener('click', function(){ uploadInput && uploadInput.click(); });
+      }
+      var backBtn = document.getElementById('btn-back');
+      var nextBtn = document.getElementById('btn-next');
+      if (backBtn) { backBtn.addEventListener('click', function(){ var idx = tabOrder.indexOf(currentTab); if (idx > 0) setTab(tabOrder[idx-1]); }); }
+      if (nextBtn) { nextBtn.addEventListener('click', function(){ var idx = tabOrder.indexOf(currentTab); if (idx < tabOrder.length-1) setTab(tabOrder[idx+1]); }); }
       var delBtn = document.getElementById('btn-delete-image');
       delBtn.addEventListener('click', function(){
         hasUploaded = false; uploadedImg = new Image(); uploadInput.value = '';
