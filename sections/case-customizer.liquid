@@ -9,7 +9,6 @@
   assign image_maps = section.blocks | where: 'type', 'base_image_map'
   assign stickers = section.blocks | where: 'sticker'
 -%}
--%}
 {%- liquid
   assign tr_title = 'case_customizer.title' | t
   if tr_title contains 'Translation missing' 
@@ -209,6 +208,9 @@
       <div>
         <div id="preview-wrap" style="position:relative;">
           <canvas id="customizer-canvas" width="{{ canvas_w }}" height="{{ canvas_w }}"></canvas>
+          <div id="preview-tools" style="position:absolute;top:8px;right:8px;display:flex;gap:8px;z-index:3;">
+            <button id="btn-delete-image" type="button" class="btn-primary" style="padding:8px 10px;">删除图片</button>
+          </div>
         </div>
         <div style="margin-top:10px;font-size:12px;color:#666;">{{ tr_hint_preview }}</div>
         <div id="sticker-list" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;">
@@ -320,6 +322,7 @@
       var frameImg = new Image();
       frameImg.crossOrigin = 'anonymous';
       var hasFrame = false;
+      var lastImgState = null;
       var imageMaps = [
         {%- for m in image_maps -%}
           {
@@ -478,6 +481,10 @@
           compCtx.drawImage(uploadedImg, -imgW / 2, -imgH / 2, imgW, imgH);
           compCtx.restore();
 
+          var absCX = areaLeft + lcX;
+          var absCY = areaTop + lcY;
+          lastImgState = { cx: absCX, cy: absCY, w: imgW, h: imgH, deg: deg, areaLeft: areaLeft, areaTop: areaTop, areaW: areaW, areaH: areaH };
+
           if (hasSticker && stickerImg.width) {
             var sxPct = parseFloat(stickerXInput.value || '50');
             var syPct = parseFloat(stickerYInput.value || '50');
@@ -540,6 +547,33 @@
 
           if (hasFrame && frameImg.width) {
             ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+          }
+
+          if (lastImgState) {
+            var bb = lastImgState;
+            var cos = Math.cos(bb.deg * Math.PI/180), sin = Math.sin(bb.deg * Math.PI/180);
+            var corners = [
+              { x: -bb.w/2, y: -bb.h/2 },
+              { x: bb.w/2, y: -bb.h/2 },
+              { x: bb.w/2, y: bb.h/2 },
+              { x: -bb.w/2, y: bb.h/2 }
+            ].map(function(p){ return { x: bb.cx + p.x * cos - p.y * sin, y: bb.cy + p.x * sin + p.y * cos }; });
+            ctx.save();
+            ctx.strokeStyle = 'rgba(17,17,17,0.35)';
+            ctx.setLineDash([6, 4]);
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(corners[0].x, corners[0].y);
+            for (var i=1;i<4;i++){ ctx.lineTo(corners[i].x, corners[i].y); }
+            ctx.closePath();
+            ctx.stroke();
+            ctx.restore();
+            var rotateHandle = { x: bb.cx + (0 * cos - (-bb.h/2 - 24) * sin), y: bb.cy + (0 * sin + (-bb.h/2 - 24) * cos) };
+            var scaleHandle = { x: bb.cx + (bb.w/2 * cos - (-bb.h/2) * sin), y: bb.cy + (bb.w/2 * sin + (-bb.h/2) * cos) };
+            ctx.save();
+            ctx.fillStyle = '#fff'; ctx.strokeStyle = '#111'; ctx.lineWidth = 1.5;
+            [rotateHandle, scaleHandle].forEach(function(h){ ctx.beginPath(); ctx.arc(h.x, h.y, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke(); });
+            ctx.restore();
           }
 
           propImgX.value = imgPctX.toFixed(2);
@@ -632,6 +666,9 @@
       var dragging = false;
       var dragStart = null;
       var startPct = { x: 50, y: 50 };
+      var transforming = null;
+      var transformStart = null;
+      function near(p, q){ var dx=p.x-q.x, dy=p.y-q.y; return Math.sqrt(dx*dx+dy*dy) <= 12; }
       canvas.addEventListener('pointerdown', function(ev){
         if (!hasUploaded) return;
         var rect = canvas.getBoundingClientRect();
@@ -640,29 +677,60 @@
         var areaTop = canvas.height * areaTopPct / 100;
         var areaW = canvas.width * areaWidthPct / 100;
         var areaH = canvas.height * areaHeightPct / 100;
-        if (x < areaLeft || x > areaLeft + areaW || y < areaTop || y > areaTop + areaH) return;
-        dragging = true; dragStart = { x: x, y: y };
-        startPct.x = parseFloat(imgXInput.value || '50');
-        startPct.y = parseFloat(imgYInput.value || '50');
+        if (!lastImgState) return;
+        var bb = lastImgState;
+        var cos = Math.cos(bb.deg * Math.PI/180), sin = Math.sin(bb.deg * Math.PI/180);
+        var rotateHandle = { x: bb.cx + (0 * cos - (-bb.h/2 - 24) * sin), y: bb.cy + (0 * sin + (-bb.h/2 - 24) * cos) };
+        var scaleHandle = { x: bb.cx + (bb.w/2 * cos - (-bb.h/2) * sin), y: bb.cy + (bb.w/2 * sin + (-bb.h/2) * cos) };
+        if (near({x:x,y:y}, rotateHandle)) {
+          transforming = 'rotate';
+          transformStart = { x: x, y: y, deg: parseFloat(rotationEl.value || '0') };
+        } else if (near({x:x,y:y}, scaleHandle)) {
+          transforming = 'scale';
+          var r0 = Math.sqrt((bb.w/2)*(bb.w/2) + (bb.h/2)*(bb.h/2));
+          var rx = x - bb.cx, ry = y - bb.cy;
+          var r = Math.sqrt(rx*rx + ry*ry);
+          transformStart = { r0: r0, r: r, scale: parseFloat(imgScaleInput.value || '100') };
+        } else {
+          if (x < areaLeft || x > areaLeft + areaW || y < areaTop || y > areaTop + areaH) return;
+          dragging = true; dragStart = { x: x, y: y };
+          startPct.x = parseFloat(imgXInput.value || '50');
+          startPct.y = parseFloat(imgYInput.value || '50');
+        }
         canvas.setPointerCapture(ev.pointerId);
       });
       canvas.addEventListener('pointermove', function(ev){
-        if (!dragging) return;
+        if (!dragging && !transforming) return;
         var rect = canvas.getBoundingClientRect();
         var x = ev.clientX - rect.left; var y = ev.clientY - rect.top;
         var areaLeft = canvas.width * areaLeftPct / 100;
         var areaTop = canvas.height * areaTopPct / 100;
         var areaW = canvas.width * areaWidthPct / 100;
         var areaH = canvas.height * areaHeightPct / 100;
-        var dx = x - dragStart.x; var dy = y - dragStart.y;
-        var nx = Math.max(0, Math.min(100, startPct.x + (dx / areaW) * 100));
-        var ny = Math.max(0, Math.min(100, startPct.y + (dy / areaH) * 100));
-        imgXInput.value = nx.toFixed(2);
-        imgYInput.value = ny.toFixed(2);
+        if (transforming === 'rotate' && lastImgState) {
+          var bb = lastImgState;
+          var ang0 = Math.atan2((transformStart.y - bb.cy), (transformStart.x - bb.cx));
+          var ang = Math.atan2((y - bb.cy), (x - bb.cx));
+          var delta = (ang - ang0) * 180 / Math.PI;
+          var nd = transformStart.deg + delta;
+          rotationEl.value = Math.round(nd);
+        } else if (transforming === 'scale' && lastImgState) {
+          var rx = x - lastImgState.cx, ry = y - lastImgState.cy;
+          var r = Math.sqrt(rx*rx + ry*ry);
+          var ratio = r / Math.max(1, transformStart.r0);
+          var nv = Math.max(10, Math.min(300, transformStart.scale * ratio));
+          imgScaleInput.value = Math.round(nv);
+        } else if (dragging) {
+          var dx = x - dragStart.x; var dy = y - dragStart.y;
+          var nx = Math.max(0, Math.min(100, startPct.x + (dx / areaW) * 100));
+          var ny = Math.max(0, Math.min(100, startPct.y + (dy / areaH) * 100));
+          imgXInput.value = nx.toFixed(2);
+          imgYInput.value = ny.toFixed(2);
+        }
         requestDraw();
       });
-      canvas.addEventListener('pointerup', function(){ dragging = false; });
-      canvas.addEventListener('pointercancel', function(){ dragging = false; });
+      canvas.addEventListener('pointerup', function(){ dragging = false; transforming = null; });
+      canvas.addEventListener('pointercancel', function(){ dragging = false; transforming = null; });
 
       canvas.addEventListener('wheel', function(ev){
         if (!hasUploaded) return;
@@ -719,52 +787,58 @@
 
       baseImg.src = {{ fallback_image | image_url: width: canvas_w | json }};
       initSelectors();
+      var delBtn = document.getElementById('btn-delete-image');
+      delBtn.addEventListener('click', function(){
+        hasUploaded = false; uploadedImg = new Image(); uploadInput.value = '';
+        propImgX.value=''; propImgY.value=''; propImgScale.value=''; rotationEl.value='0';
+        requestDraw();
+      });
     })();
   </script>
 {%- endif -%}
 
 {% schema %}
 {
-  "name": "Case Customizer",
+  "name": "手机壳定制",
   "settings": [
-    { "type": "text", "id": "product_handle", "label": "Product handle", "info": "Handle of the phone case product to customize" },
-    { "type": "text", "id": "model_option_name", "label": "Model option name", "default": "Model" },
-    { "type": "text", "id": "case_type_option_name", "label": "Case type option name", "default": "Case Type" },
-    { "type": "image_picker", "id": "mockup_image", "label": "Default mockup image" },
-    { "type": "range", "id": "outside_alpha", "label": "Outside preview opacity", "min": 0, "max": 80, "step": 5, "default": 25, "unit": "%" },
-    { "type": "range", "id": "canvas_width", "label": "Canvas width", "min": 300, "max": 1200, "step": 50, "default": 700, "unit": "px" },
-    { "type": "range", "id": "area_left", "label": "Printable area Left", "min": 0, "max": 100, "step": 1, "default": 10, "unit": "%" },
-    { "type": "range", "id": "area_top", "label": "Printable area Top", "min": 0, "max": 100, "step": 1, "default": 10, "unit": "%" },
-    { "type": "range", "id": "area_width", "label": "Printable area Width", "min": 10, "max": 100, "step": 1, "default": 80, "unit": "%" },
-    { "type": "range", "id": "area_height", "label": "Printable area Height", "min": 10, "max": 100, "step": 1, "default": 80, "unit": "%" }
+    { "type": "text", "id": "product_handle", "label": "商品句柄", "info": "要定制的手机壳商品句柄" },
+    { "type": "text", "id": "model_option_name", "label": "型号选项名", "default": "型号" },
+    { "type": "text", "id": "case_type_option_name", "label": "壳类型选项名", "default": "壳类型" },
+    { "type": "image_picker", "id": "mockup_image", "label": "默认底图" },
+    { "type": "range", "id": "outside_alpha", "label": "遮罩外预览不透明度", "min": 0, "max": 80, "step": 5, "default": 25, "unit": "%" },
+    { "type": "range", "id": "canvas_width", "label": "画布宽度", "min": 300, "max": 1200, "step": 50, "default": 700, "unit": "px" },
+    { "type": "range", "id": "area_left", "label": "可印刷区域 左", "min": 0, "max": 100, "step": 1, "default": 10, "unit": "%" },
+    { "type": "range", "id": "area_top", "label": "可印刷区域 上", "min": 0, "max": 100, "step": 1, "default": 10, "unit": "%" },
+    { "type": "range", "id": "area_width", "label": "可印刷区域 宽", "min": 10, "max": 100, "step": 1, "default": 80, "unit": "%" },
+    { "type": "range", "id": "area_height", "label": "可印刷区域 高", "min": 10, "max": 100, "step": 1, "default": 80, "unit": "%" }
   ],
   "blocks": [
     {
       "type": "base_image_map",
-      "name": "Base image mapping",
+      "name": "底图映射",
       "settings": [
-        { "type": "text", "id": "model_value", "label": "Model value e.g. iPhone 15" },
-        { "type": "text", "id": "case_type_value", "label": "Case type value e.g. Clear" },
-        { "type": "image_picker", "id": "image", "label": "Base image" },
-        { "type": "image_picker", "id": "mask", "label": "Mask image (transparent for holes/non-printable)" },
-        { "type": "image_picker", "id": "frame", "label": "Frame overlay image (top realism layer)" },
-        { "type": "range", "id": "area_left", "label": "Left offset for this combo", "min": 0, "max": 100, "step": 1, "default": 10, "unit": "%" },
-        { "type": "range", "id": "area_top", "label": "Top offset for this combo", "min": 0, "max": 100, "step": 1, "default": 10, "unit": "%" },
-        { "type": "range", "id": "area_width", "label": "Area width for this combo", "min": 10, "max": 100, "step": 1, "default": 80, "unit": "%" },
-        { "type": "range", "id": "area_height", "label": "Area height for this combo", "min": 10, "max": 100, "step": 1, "default": 80, "unit": "%" }
+        { "type": "text", "id": "model_value", "label": "型号值（如 iPhone 15）" },
+        { "type": "text", "id": "case_type_value", "label": "壳类型值（如 透明/磨砂）" },
+        { "type": "image_picker", "id": "image", "label": "底图" },
+        { "type": "image_picker", "id": "mask", "label": "遮罩图（孔位/不可印刷处透明）" },
+        { "type": "image_picker", "id": "frame", "label": "框架叠层图（提升真实感）" },
+        { "type": "range", "id": "area_left", "label": "该组合 左偏移", "min": 0, "max": 100, "step": 1, "default": 10, "unit": "%" },
+        { "type": "range", "id": "area_top", "label": "该组合 上偏移", "min": 0, "max": 100, "step": 1, "default": 10, "unit": "%" },
+        { "type": "range", "id": "area_width", "label": "该组合 区域宽度", "min": 10, "max": 100, "step": 1, "default": 80, "unit": "%" },
+        { "type": "range", "id": "area_height", "label": "该组合 区域高度", "min": 10, "max": 100, "step": 1, "default": 80, "unit": "%" }
       ]
     },
     {
       "type": "sticker",
-      "name": "Sticker",
+      "name": "贴纸",
       "settings": [
-        { "type": "text", "id": "name", "label": "Sticker name", "default": "Sticker" },
-        { "type": "image_picker", "id": "image", "label": "Sticker image" }
+        { "type": "text", "id": "name", "label": "贴纸名称", "default": "贴纸" },
+        { "type": "image_picker", "id": "image", "label": "贴纸图片" }
       ]
     }
   ],
   "presets": [
-    { "name": "Phone Case Customizer" }
+    { "name": "手机壳定制" }
   ]
 }
 {% endschema %}
