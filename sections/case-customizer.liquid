@@ -178,6 +178,50 @@
   if tr_prop_rotation contains 'Translation missing'
     assign tr_prop_rotation = 'Rotation (deg)'
   endif
+  assign tr_tab_model = 'case_customizer.tab_model' | t
+  if tr_tab_model contains 'Translation missing'
+    assign tr_tab_model = 'Model'
+  endif
+  assign tr_tab_color = 'case_customizer.tab_color' | t
+  if tr_tab_color contains 'Translation missing'
+    assign tr_tab_color = 'Colour'
+  endif
+  assign tr_tab_pattern = 'case_customizer.tab_pattern' | t
+  if tr_tab_pattern contains 'Translation missing'
+    assign tr_tab_pattern = 'Pattern'
+  endif
+  assign tr_tab_image = 'case_customizer.tab_image' | t
+  if tr_tab_image contains 'Translation missing'
+    assign tr_tab_image = 'Image'
+  endif
+  assign tr_note_select_model = 'case_customizer.note_select_model' | t
+  if tr_note_select_model contains 'Translation missing'
+    assign tr_note_select_model = 'Select a model and case type to load the correct mockup'
+  endif
+  assign tr_btn_delete_image = 'case_customizer.btn_delete_image' | t
+  if tr_btn_delete_image contains 'Translation missing'
+    assign tr_btn_delete_image = 'Delete Image'
+  endif
+  assign tr_btn_upload_image = 'case_customizer.btn_upload_image' | t
+  if tr_btn_upload_image contains 'Translation missing'
+    assign tr_btn_upload_image = 'Upload Image'
+  endif
+  assign tr_image_state_none = 'case_customizer.image_state_none' | t
+  if tr_image_state_none contains 'Translation missing'
+    assign tr_image_state_none = 'No image selected'
+  endif
+  assign tr_image_state_selected = 'case_customizer.image_state_selected' | t
+  if tr_image_state_selected contains 'Translation missing'
+    assign tr_image_state_selected = 'Image selected'
+  endif
+  assign tr_btn_back = 'case_customizer.btn_back' | t
+  if tr_btn_back contains 'Translation missing'
+    assign tr_btn_back = 'Back'
+  endif
+  assign tr_btn_next = 'case_customizer.btn_next' | t
+  if tr_btn_next contains 'Translation missing'
+    assign tr_btn_next = 'Next'
+  endif
 -%}
 <style>
   .container { max-width: min(1280px, 94vw); margin: 0 auto; padding: 24px; }
@@ -229,10 +273,10 @@
   <div class="container">
     <div class="grid">
       <div>
-        <div id="preview-wrap" style="position:relative;">
+          <div id="preview-wrap" style="position:relative;">
           <canvas id="customizer-canvas" width="{{ canvas_w }}" height="{{ canvas_w }}"></canvas>
           <div id="preview-tools" style="position:absolute;top:8px;right:8px;display:flex;gap:8px;z-index:3;">
-            <button id="btn-delete-image" type="button" class="btn-primary" style="padding:8px 10px;">删除图片</button>
+            <button id="btn-delete-image" type="button" class="btn-primary" style="padding:8px 10px;">{{ tr_btn_delete_image }}</button>
           </div>
         </div>
         <div style="margin-top:10px;font-size:12px;color:#666;">{{ tr_hint_preview }}</div>
@@ -248,15 +292,15 @@
         <div class="panel-card sticky">
           <div class="panel-title">Create a Phone Case</div>
           <div class="tabs">
-            <button type="button" class="tab-btn active" data-tab="model">MODEL</button>
-            <button type="button" class="tab-btn" data-tab="color">COLOUR</button>
-            <button type="button" class="tab-btn" data-tab="pattern">PATTERN</button>
-            <button type="button" class="tab-btn" data-tab="image">IMAGE</button>
+            <button type="button" class="tab-btn active" data-tab="model">{{ tr_tab_model }}</button>
+            <button type="button" class="tab-btn" data-tab="color">{{ tr_tab_color }}</button>
+            <button type="button" class="tab-btn" data-tab="pattern">{{ tr_tab_pattern }}</button>
+            <button type="button" class="tab-btn" data-tab="image">{{ tr_tab_image }}</button>
           </div>
           <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
           <div class="step-nav">
-            <button id="btn-back" type="button" class="btn-outline">BACK</button>
-            <button id="btn-next" type="button" class="btn-primary" style="width:auto;">NEXT</button>
+            <button id="btn-back" type="button" class="btn-outline">{{ tr_btn_back }}</button>
+            <button id="btn-next" type="button" class="btn-primary" style="width:auto;">{{ tr_btn_next }}</button>
           </div>
           <div id="tab-model" class="tab-content active">
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -269,7 +313,7 @@
                 <select id="select-type" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"></select>
               </div>
             </div>
-            <div class="panel-note">选择型号与壳类型后，将展示对应底图</div>
+            <div class="panel-note">{{ tr_note_select_model }}</div>
           </div>
           <div id="tab-color" class="tab-content">
             <div class="palette" id="palette">
@@ -325,9 +369,9 @@
           </div>
           <div id="tab-image" class="tab-content">
             <div style="display:flex; gap:10px; align-items:center;">
-              <button id="trigger-upload" type="button" class="btn-primary" style="width:auto; padding:10px 14px;">上传图片</button>
-              <div id="image-state" style="font-size:12px; color:#666;">未选择图片</div>
-            </div>
+            <button id="trigger-upload" type="button" class="btn-primary" style="width:auto; padding:10px 14px;">{{ tr_btn_upload_image }}</button>
+            <div id="image-state" style="font-size:12px; color:#666;">{{ tr_image_state_none }}</div>
+          </div>
             <input id="input-image" type="file" accept="image/*" name="properties[{{ tr_prop_image }}]" style="display:none;">
           </div>
         </div>
@@ -849,11 +893,21 @@
       }
 
       function initSelectors() {
-        var opts = {{ custom_product.options_with_values | json }};
-        var modelOpt = opts.find(function(o){ return o.name === {{ model_option_name | json }}; });
-        var typeOpt = opts.find(function(o){ return o.name === {{ type_option_name | json }}; });
-        selectModel.innerHTML = (modelOpt ? modelOpt.values : []).map(function(v){ return '<option>'+v+'</option>'; }).join('');
-        selectType.innerHTML = (typeOpt ? typeOpt.values : []).map(function(v){ return '<option>'+v+'</option>'; }).join('');
+        var models = [];
+        var types = [];
+        imageMaps.forEach(function(m){
+          if (m.model && models.indexOf(m.model) === -1) models.push(m.model);
+          if (m.type && types.indexOf(m.type) === -1) types.push(m.type);
+        });
+        if (models.length === 0 || types.length === 0) {
+          var opts = {{ custom_product.options_with_values | json }};
+          var modelOpt = opts.find(function(o){ return o.name === {{ model_option_name | json }}; }) || { values: [] };
+          var typeOpt = opts.find(function(o){ return o.name === {{ type_option_name | json }}; }) || { values: [] };
+          models = modelOpt.values || [];
+          types = typeOpt.values || [];
+        }
+        selectModel.innerHTML = models.map(function(v){ return '<option>'+v+'</option>'; }).join('');
+        selectType.innerHTML = types.map(function(v){ return '<option>'+v+'</option>'; }).join('');
         var m = selectModel.value;
         var t = selectType.value;
         var v = findVariantByOptions(m, t) || {{ custom_product.selected_or_first_available_variant | json }};
@@ -869,7 +923,7 @@
         uploadedImg.src = url;
       });
       if (uploadInput) {
-        uploadInput.addEventListener('change', function(){ if (imageState) { imageState.textContent = '已选择图片'; } });
+        uploadInput.addEventListener('change', function(){ if (imageState) { imageState.textContent = trImageSelected; } });
       }
 
       document.getElementById('sticker-list').addEventListener('click', function(e){
@@ -1128,3 +1182,5 @@
   ]
 }
 {% endschema %}
+      var trImageSelected = {{ tr_image_state_selected | json }};
+      var trImageNone = {{ tr_image_state_none | json }};
