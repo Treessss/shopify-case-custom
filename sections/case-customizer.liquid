@@ -227,7 +227,20 @@
   .container { max-width: min(1280px, 94vw); margin: 0 auto; padding: 24px; }
   .grid { display: grid; grid-template-columns: clamp(280px, 42vw, 520px) 1fr; gap: 24px; align-items: start; }
   @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; gap: 18px; } }
-  @media (max-width: 640px) { .container { padding: 16px; } }
+  @media (max-width: 640px) { 
+    .container { max-width: 100vw; width: 100vw; padding: 12px; margin: 0; }
+    .panel-card { padding: 16px; }
+    .panel-title { font-size: 22px; }
+    .tabs { flex-wrap: wrap; }
+    .tab-btn { padding: 8px 10px; }
+    .progress { margin: 8px 0 12px; }
+    .step-nav { gap: 8px; }
+    #preview-wrap { border-radius: 10px; }
+  }
+  @media (max-width: 480px) {
+    .container { padding: 10px; }
+    .panel-title { font-size: 20px; }
+  }
   #preview-wrap { position: relative; border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
   #preview-wrap canvas { width: 100%; height: auto; display: block; }
   .panel-card { border: 1px solid #e5e5e5; border-radius: 12px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); padding: 20px; }
@@ -276,7 +289,7 @@
           <div id="preview-wrap" style="position:relative;">
           <canvas id="customizer-canvas" width="{{ canvas_w }}" height="{{ canvas_w }}"></canvas>
           <div id="preview-tools" style="position:absolute;top:8px;right:8px;display:flex;gap:8px;z-index:3;">
-            <button id="btn-delete-image" type="button" class="btn-primary" style="padding:8px 10px;">{{ tr_btn_delete_image }}</button>
+            <button id="btn-delete-image" type="button" class="btn-primary" style="padding:8px 10px; display:none;">{{ tr_btn_delete_image }}</button>
           </div>
         </div>
         <div style="margin-top:10px;font-size:12px;color:#666;">{{ tr_hint_preview }}</div>
@@ -496,6 +509,8 @@
       var propPatternType = document.getElementById('prop-pattern-type');
       var propPatternScale = document.getElementById('prop-pattern-scale');
       var propPatternOpacity = document.getElementById('prop-pattern-opacity');
+      var trImageSelected = {{ tr_image_state_selected | json }};
+      var trImageNone = {{ tr_image_state_none | json }};
       var propTextX = document.getElementById('prop-text-x');
       var propTextY = document.getElementById('prop-text-y');
       var propTextSize = document.getElementById('prop-text-size');
@@ -672,12 +687,7 @@
         var areaTop = canvas.height * areaTopPct / 100;
         var areaW = canvas.width * areaWidthPct / 100;
         var areaH = canvas.height * areaHeightPct / 100;
-        ctx.save();
-        ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-        ctx.setLineDash([6, 4]);
-        ctx.lineWidth = 2;
-        ctx.strokeRect(areaLeft, areaTop, areaW, areaH);
-        ctx.restore();
+        
         if (patternType && patternType !== 'none') {
           var scalePct = patternScaleInput ? parseFloat(patternScaleInput.value || '100') : 100;
           var tile = generatePatternCanvas(patternType, caseColor, scalePct);
@@ -824,16 +834,7 @@
               { x: bb.w/2, y: bb.h/2 },
               { x: -bb.w/2, y: bb.h/2 }
             ].map(function(p){ return { x: bb.cx + p.x * cos - p.y * sin, y: bb.cy + p.x * sin + p.y * cos }; });
-            ctx.save();
-            ctx.strokeStyle = 'rgba(17,17,17,0.35)';
-            ctx.setLineDash([6, 4]);
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(corners[0].x, corners[0].y);
-            for (var i=1;i<4;i++){ ctx.lineTo(corners[i].x, corners[i].y); }
-            ctx.closePath();
-            ctx.stroke();
-            ctx.restore();
+            
             var rotateHandle = { x: bb.cx + (0 * cos - (-bb.h/2 - 24) * sin), y: bb.cy + (0 * sin + (-bb.h/2 - 24) * cos) };
             var scaleHandle = { x: bb.cx + (bb.w/2 * cos - (-bb.h/2) * sin), y: bb.cy + (bb.w/2 * sin + (-bb.h/2) * cos) };
             ctx.save();
@@ -923,7 +924,7 @@
         uploadedImg.src = url;
       });
       if (uploadInput) {
-        uploadInput.addEventListener('change', function(){ if (imageState) { imageState.textContent = trImageSelected; } });
+        uploadInput.addEventListener('change', function(){ if (imageState) { imageState.textContent = trImageSelected; } updateDeleteBtn(); });
       }
 
       document.getElementById('sticker-list').addEventListener('click', function(e){
@@ -1088,6 +1089,7 @@
       }
       Array.prototype.forEach.call(tabBtns, function(b){ b.addEventListener('click', function(){ setTab(b.dataset.tab); }); });
       setTab('model');
+      updateDeleteBtn();
       palette.addEventListener('click', function(e){
         var c = e.target && e.target.dataset && e.target.dataset.color;
         if (!c) return;
@@ -1128,11 +1130,16 @@
       if (backBtn) { backBtn.addEventListener('click', function(){ var idx = tabOrder.indexOf(currentTab); if (idx > 0) setTab(tabOrder[idx-1]); }); }
       if (nextBtn) { nextBtn.addEventListener('click', function(){ var idx = tabOrder.indexOf(currentTab); if (idx < tabOrder.length-1) setTab(tabOrder[idx+1]); }); }
       var delBtn = document.getElementById('btn-delete-image');
-      delBtn.addEventListener('click', function(){
-        hasUploaded = false; uploadedImg = new Image(); uploadInput.value = '';
-        propImgX.value=''; propImgY.value=''; propImgScale.value=''; rotationEl.value='0';
-        requestDraw();
-      });
+      function updateDeleteBtn(){ if (delBtn) delBtn.style.display = hasUploaded ? '' : 'none'; }
+      if (delBtn) {
+        delBtn.addEventListener('click', function(){
+          hasUploaded = false; uploadedImg = new Image(); uploadInput.value = '';
+          propImgX.value=''; propImgY.value=''; propImgScale.value=''; rotationEl.value='0';
+          if (imageState) imageState.textContent = trImageNone;
+          updateDeleteBtn();
+          requestDraw();
+        });
+      }
     })();
   </script>
 {%- endif -%}
@@ -1182,5 +1189,3 @@
   ]
 }
 {% endschema %}
-      var trImageSelected = {{ tr_image_state_selected | json }};
-      var trImageNone = {{ tr_image_state_none | json }};
