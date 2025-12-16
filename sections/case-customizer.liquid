@@ -248,7 +248,8 @@
         <div class="panel-card sticky">
           <div class="panel-title">Create a Phone Case</div>
           <div class="tabs">
-            <button type="button" class="tab-btn active" data-tab="color">COLOUR</button>
+            <button type="button" class="tab-btn active" data-tab="model">MODEL</button>
+            <button type="button" class="tab-btn" data-tab="color">COLOUR</button>
             <button type="button" class="tab-btn" data-tab="pattern">PATTERN</button>
             <button type="button" class="tab-btn" data-tab="image">IMAGE</button>
           </div>
@@ -257,7 +258,20 @@
             <button id="btn-back" type="button" class="btn-outline">BACK</button>
             <button id="btn-next" type="button" class="btn-primary" style="width:auto;">NEXT</button>
           </div>
-          <div id="tab-color" class="tab-content active">
+          <div id="tab-model" class="tab-content active">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div>
+                <label style="display:block;margin-bottom:6px;">{{ tr_field_model }}</label>
+                <select id="select-model" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"></select>
+              </div>
+              <div>
+                <label style="display:block;margin-bottom:6px;">{{ tr_field_case_type }}</label>
+                <select id="select-type" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"></select>
+              </div>
+            </div>
+            <div class="panel-note">选择型号与壳类型后，将展示对应底图</div>
+          </div>
+          <div id="tab-color" class="tab-content">
             <div class="palette" id="palette">
               <div class="swatch" data-color="#ffffff" style="background:#ffffff"></div>
               <div class="swatch" data-color="#f4f4f4" style="background:#f4f4f4"></div>
@@ -314,94 +328,54 @@
               <button id="trigger-upload" type="button" class="btn-primary" style="width:auto; padding:10px 14px;">上传图片</button>
               <div id="image-state" style="font-size:12px; color:#666;">未选择图片</div>
             </div>
+            <input id="input-image" type="file" accept="image/*" name="properties[{{ tr_prop_image }}]" style="display:none;">
           </div>
         </div>
         {%- assign form_id = 'case-customizer-form-' | append: section.id -%}
         {%- form 'product', custom_product, id: form_id, class: 'form', novalidate: 'novalidate' -%}
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <div>
-              <label style="display:block;margin-bottom:6px;">{{ tr_field_model }}</label>
-              <select id="select-model" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"></select>
-            </div>
-            <div>
-              <label style="display:block;margin-bottom:6px;">{{ tr_field_case_type }}</label>
-              <select id="select-type" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"></select>
-            </div>
-            <input type="hidden" name="id" id="variant-id">
-            <div>
-              <label style="display:block;margin-bottom:6px;">{{ tr_field_upload_image }}</label>
-              <input id="input-image" type="file" accept="image/*" name="properties[{{ tr_prop_image }}]" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
-              <input type="hidden" name="properties[{{ tr_prop_image_x }}]" id="prop-image-x">
-              <input type="hidden" name="properties[{{ tr_prop_image_y }}]" id="prop-image-y">
-              <input type="hidden" name="properties[{{ tr_prop_image_scale }}]" id="prop-image-scale">
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_image_x }}</label><input id="image-x" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_image_y }}</label><input id="image-y" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_image_scale }}</label><input id="image-scale" type="range" min="10" max="200" value="100" style="width:100%;"></div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div>
-                <label style="display:block;margin-bottom:6px;">{{ tr_fit_mode_label }}</label>
-                <select id="fit-mode" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
-                  <option value="cover">{{ tr_fit_mode_cover }}</option>
-                  <option value="contain">{{ tr_fit_mode_contain }}</option>
-                  <option value="stretch">{{ tr_fit_mode_stretch }}</option>
-                </select>
-                <div style="margin-top:8px;display:flex;gap:12px;align-items:center;">
-                  <label style="display:flex;gap:6px;align-items:center;">
-                    <input id="auto-fit" type="checkbox" checked>
-                    <span>{{ tr_auto_fit }}</span>
-                  </label>
-                  <label style="display:flex;gap:6px;align-items:center;">
-                    <input id="clip-area" type="checkbox" checked>
-                    <span>{{ tr_clip_to_area }}</span>
-                  </label>
-                </div>
-              </div>
-              <div>
-                <label style="display:block;margin-bottom:6px;">{{ tr_image_rotation }}</label>
-                <input id="image-rotation" type="range" min="-180" max="180" value="0" style="width:100%;">
-              </div>
-            </div>
-            <input type="hidden" name="properties[{{ tr_prop_fit_mode }}]" id="prop-fit-mode">
-            <input type="hidden" name="properties[{{ tr_prop_rotation }}]" id="prop-image-rotation">
-            <div>
-              <label style="display:block;margin-bottom:6px;">{{ tr_field_text }}</label>
-              <input id="input-text" type="text" name="properties[{{ tr_prop_text }}]" placeholder="{{ tr_field_text_placeholder }}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
-              <input type="hidden" name="properties[{{ tr_prop_text_x }}]" id="prop-text-x">
-              <input type="hidden" name="properties[{{ tr_prop_text_y }}]" id="prop-text-y">
-              <input type="hidden" name="properties[{{ tr_prop_text_size }}]" id="prop-text-size">
-              <input type="hidden" name="properties[{{ tr_prop_text_color }}]" id="prop-text-color">
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_text_x }}</label><input id="text-x" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_text_y }}</label><input id="text-y" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_text_size }}</label><input id="text-size" type="range" min="12" max="64" value="26" style="width:100%;"></div>
-              <div><label style="display:block;margin-bottom:6px;">{{ tr_field_text_color }}</label><input id="text-color" type="color" value="#111111" style="width:100%;height:38px;border:1px solid #ddd;border-radius:6px;"></div>
-            </div>
-            <div>
-              <label style="display:block;margin-bottom:6px;">{{ tr_sticker_controls }}</label>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <div><label style="display:block;margin-bottom:6px;">{{ tr_sticker_x }}</label><input id="sticker-x" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-                <div><label style="display:block;margin-bottom:6px;">{{ tr_sticker_y }}</label><input id="sticker-y" type="range" min="0" max="100" value="50" style="width:100%;"></div>
-                <div><label style="display:block;margin-bottom:6px;">{{ tr_sticker_scale }}</label><input id="sticker-scale" type="range" min="10" max="200" value="100" style="width:100%;"></div>
-              </div>
-              <input type="hidden" name="properties[{{ tr_prop_sticker_name }}]" id="prop-sticker-name">
-              <input type="hidden" name="properties[{{ tr_prop_sticker_x }}]" id="prop-sticker-x">
-              <input type="hidden" name="properties[{{ tr_prop_sticker_y }}]" id="prop-sticker-y">
-              <input type="hidden" name="properties[{{ tr_prop_sticker_scale }}]" id="prop-sticker-scale">
-            </div>
-            <div><button type="submit" class="btn-primary">{{ tr_submit }}</button></div>
-          </div>
-            <input type="hidden" id="data-area-left" value="{{ st.area_left }}">
-            <input type="hidden" id="data-area-top" value="{{ st.area_top }}">
-            <input type="hidden" id="data-area-width" value="{{ st.area_width }}">
+          
+          <input type="hidden" name="id" id="variant-id">
+          <input type="hidden" name="properties[{{ tr_prop_image_x }}]" id="prop-image-x">
+          <input type="hidden" name="properties[{{ tr_prop_image_y }}]" id="prop-image-y">
+          <input type="hidden" name="properties[{{ tr_prop_image_scale }}]" id="prop-image-scale">
+          <input type="hidden" name="properties[{{ tr_prop_fit_mode }}]" id="prop-fit-mode">
+          <input type="hidden" name="properties[{{ tr_prop_rotation }}]" id="prop-image-rotation">
+          <input type="hidden" name="properties[{{ tr_prop_text_x }}]" id="prop-text-x">
+          <input type="hidden" name="properties[{{ tr_prop_text_y }}]" id="prop-text-y">
+          <input type="hidden" name="properties[{{ tr_prop_text_size }}]" id="prop-text-size">
+          <input type="hidden" name="properties[{{ tr_prop_text_color }}]" id="prop-text-color">
+          <input type="hidden" name="properties[{{ tr_prop_sticker_name }}]" id="prop-sticker-name">
+          <input type="hidden" name="properties[{{ tr_prop_sticker_x }}]" id="prop-sticker-x">
+          <input type="hidden" name="properties[{{ tr_prop_sticker_y }}]" id="prop-sticker-y">
+          <input type="hidden" name="properties[{{ tr_prop_sticker_scale }}]" id="prop-sticker-scale">
+          <div><button type="submit" class="btn-primary">{{ tr_submit }}</button></div>
+          <input type="hidden" id="data-area-left" value="{{ st.area_left }}">
+          <input type="hidden" id="data-area-top" value="{{ st.area_top }}">
+          <input type="hidden" id="data-area-width" value="{{ st.area_width }}">
           <input type="hidden" id="data-area-height" value="{{ st.area_height }}">
           <input type="hidden" name="properties[Case Color HEX]" id="prop-case-color">
           <input type="hidden" name="properties[Case Pattern Type]" id="prop-pattern-type">
           <input type="hidden" name="properties[Case Pattern Scale]" id="prop-pattern-scale">
           <input type="hidden" name="properties[Case Pattern Opacity]" id="prop-pattern-opacity">
+          <input type="hidden" id="image-x" value="50">
+          <input type="hidden" id="image-y" value="50">
+          <input type="hidden" id="image-scale" value="100">
+          <input type="hidden" id="image-rotation" value="0">
+          <input type="hidden" id="input-text" value="">
+          <input type="hidden" id="text-x" value="50">
+          <input type="hidden" id="text-y" value="50">
+          <input type="hidden" id="text-size" value="26">
+          <input type="hidden" id="text-color" value="#111111">
+          <input type="hidden" id="sticker-x" value="50">
+          <input type="hidden" id="sticker-y" value="50">
+          <input type="hidden" id="sticker-scale" value="100">
+          <select id="fit-mode" style="display:none">
+            <option value="cover">{{ tr_fit_mode_cover }}</option>
+            <option value="contain">{{ tr_fit_mode_contain }}</option>
+            <option value="stretch">{{ tr_fit_mode_stretch }}</option>
+          </select>
+          <input id="auto-fit" type="checkbox" checked style="display:none">
+          <input id="clip-area" type="checkbox" checked style="display:none">
         {%- endform -%}
       </div>
     </div>
@@ -689,9 +663,9 @@
           ctx.restore();
         }
         if (hasUploaded && uploadedImg.width) {
-          var imgPctX = parseFloat(imgXInput.value || '50');
-          var imgPctY = parseFloat(imgYInput.value || '50');
-          var imgScalePct = parseFloat(imgScaleInput.value || '100');
+        var imgPctX = imgXInput ? parseFloat(imgXInput.value || '50') : 50;
+        var imgPctY = imgYInput ? parseFloat(imgYInput.value || '50') : 50;
+        var imgScalePct = imgScaleInput ? parseFloat(imgScaleInput.value || '100') : 100;
           var aspect = uploadedImg.width / uploadedImg.height;
           var areaAspect = areaW / areaH;
           var mode = (fitModeEl && fitModeEl.value) || 'cover';
@@ -911,7 +885,7 @@
       });
 
       [imgXInput, imgYInput, imgScaleInput, textInput, textXInput, textYInput, textSizeInput, textColorInput, stickerXInput, stickerYInput, stickerScaleInput, fitModeEl, autoFitEl, clipEl, rotationEl].forEach(function(el) {
-        el.addEventListener('input', requestDraw);
+        if (el) el.addEventListener('input', requestDraw);
       });
 
       var dragging = false;
@@ -935,18 +909,20 @@
         var scaleHandle = { x: bb.cx + (bb.w/2 * cos - (-bb.h/2) * sin), y: bb.cy + (bb.w/2 * sin + (-bb.h/2) * cos) };
         if (near({x:x,y:y}, rotateHandle)) {
           transforming = 'rotate';
-          transformStart = { x: x, y: y, deg: parseFloat(rotationEl.value || '0') };
+          var curDeg = rotationEl ? parseFloat(rotationEl.value || '0') : 0;
+          transformStart = { x: x, y: y, deg: curDeg };
         } else if (near({x:x,y:y}, scaleHandle)) {
           transforming = 'scale';
           var r0 = Math.sqrt((bb.w/2)*(bb.w/2) + (bb.h/2)*(bb.h/2));
           var rx = x - bb.cx, ry = y - bb.cy;
           var r = Math.sqrt(rx*rx + ry*ry);
-          transformStart = { r0: r0, r: r, scale: parseFloat(imgScaleInput.value || '100') };
+          var curScale = imgScaleInput ? parseFloat(imgScaleInput.value || '100') : 100;
+          transformStart = { r0: r0, r: r, scale: curScale };
         } else {
           if (x < areaLeft || x > areaLeft + areaW || y < areaTop || y > areaTop + areaH) return;
           dragging = true; dragStart = { x: x, y: y };
-          startPct.x = parseFloat(imgXInput.value || '50');
-          startPct.y = parseFloat(imgYInput.value || '50');
+          startPct.x = imgXInput ? parseFloat(imgXInput.value || '50') : 50;
+          startPct.y = imgYInput ? parseFloat(imgYInput.value || '50') : 50;
         }
         canvas.setPointerCapture(ev.pointerId);
       });
@@ -964,19 +940,19 @@
           var ang = Math.atan2((y - bb.cy), (x - bb.cx));
           var delta = (ang - ang0) * 180 / Math.PI;
           var nd = transformStart.deg + delta;
-          rotationEl.value = Math.round(nd);
+          if (rotationEl) rotationEl.value = Math.round(nd);
         } else if (transforming === 'scale' && lastImgState) {
           var rx = x - lastImgState.cx, ry = y - lastImgState.cy;
           var r = Math.sqrt(rx*rx + ry*ry);
           var ratio = r / Math.max(1, transformStart.r0);
           var nv = Math.max(10, Math.min(300, transformStart.scale * ratio));
-          imgScaleInput.value = Math.round(nv);
+          if (imgScaleInput) imgScaleInput.value = Math.round(nv);
         } else if (dragging) {
           var dx = x - dragStart.x; var dy = y - dragStart.y;
           var nx = Math.max(0, Math.min(100, startPct.x + (dx / areaW) * 100));
           var ny = Math.max(0, Math.min(100, startPct.y + (dy / areaH) * 100));
-          imgXInput.value = nx.toFixed(2);
-          imgYInput.value = ny.toFixed(2);
+          if (imgXInput) imgXInput.value = nx.toFixed(2);
+          if (imgYInput) imgYInput.value = ny.toFixed(2);
         }
         requestDraw();
       });
@@ -1039,14 +1015,14 @@
       baseImg.src = {{ fallback_image | image_url: width: canvas_w | json }};
       initSelectors();
       var tabBtns = document.querySelectorAll('.tab-btn');
-      var tabViews = { color: document.getElementById('tab-color'), pattern: document.getElementById('tab-pattern'), image: document.getElementById('tab-image') };
-      var tabOrder = ['color','pattern','image'];
-      var currentTab = 'color';
+      var tabViews = { model: document.getElementById('tab-model'), color: document.getElementById('tab-color'), pattern: document.getElementById('tab-pattern'), image: document.getElementById('tab-image') };
+      var tabOrder = ['model','color','pattern','image'];
+      var currentTab = 'model';
       function setTab(t){
         Array.prototype.forEach.call(tabBtns, function(b){ b.classList.toggle('active', b.dataset.tab === t); });
         Object.keys(tabViews).forEach(function(k){ tabViews[k].classList.toggle('active', k === t); });
         if (progressBar) {
-          var pct = t === 'color' ? 33 : (t === 'pattern' ? 66 : 100);
+          var pct = t === 'model' ? 25 : (t === 'color' ? 50 : (t === 'pattern' ? 75 : 100));
           progressBar.style.width = pct + '%';
         }
         currentTab = t;
@@ -1057,7 +1033,7 @@
         if (nextBtn) nextBtn.disabled = idx >= tabOrder.length - 1;
       }
       Array.prototype.forEach.call(tabBtns, function(b){ b.addEventListener('click', function(){ setTab(b.dataset.tab); }); });
-      setTab('color');
+      setTab('model');
       palette.addEventListener('click', function(e){
         var c = e.target && e.target.dataset && e.target.dataset.color;
         if (!c) return;
